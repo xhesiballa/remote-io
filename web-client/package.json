@@ -1,0 +1,8 @@
+{
+  "name": "socket-io-client",
+  "version": "0.0.1",
+  "description": "client for the io integration layer",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
