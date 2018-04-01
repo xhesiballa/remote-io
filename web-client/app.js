@@ -6,10 +6,10 @@ var integration = require('./lib/integration.js');
 
 var socketClient = new net.Socket();
 
-// socketClient.connect(1000, '127.0.0.1');
-// socketClient.on('connect', () => {
-// 	console.log("established socket conection on port 1000");
-// })
+socketClient.connect(1000, '127.0.0.1');
+socketClient.on('connect', () => {
+	console.log("established socket conection on port 1000");
+})
 
 
 //http server
@@ -18,15 +18,20 @@ http.listen(3000, function(){
 });
 
 app.use(express.static('public'));
-
-// app.get('/', function(req, res){
-// 	res.sendFile(__dirname + '/public/controls.html');
-// });
-
-app.post('/mouse/move/:direction', function(req, res){
+app.post('/mouse/move/:x/:y', function(req, res){
 	var mb = new integration.messageBuilder();
-	mb.setTarget('mouse').setAction('move').addParameter(req.params.direction);
-	console.log(req.params);
+	mb.setTarget('mouse').setAction('move').addParameter(req.params.x).addParameter(req.params.y);
+	socketClient.write(mb.build() + '\n');
+	// console.log(req.params);
 	res.send(mb.build());
-})
+});
+
+app.post('/mouse/click/:button', function(req, res){
+	var mb = new integration.messageBuilder();
+	mb.setTarget('mouse').setAction('click').addParameter(req.params.button);
+	socketClient.write(mb.build() + '\n');
+	// console.log(req.params);
+	res.send(mb.build());
+});
+
 

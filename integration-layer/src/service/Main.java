@@ -1,6 +1,7 @@
 package service;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,36 +41,46 @@ public class Main {
                 String command = split[0];
 
                 switch (command) {
-                    case "moveMouse":
-                        String direction = split[1];
-                        main.moveMouse(direction);
+                    case "mouse":
+                        main.handleMouseEvent(split);
                         break;
                 }
             }
         }
     }
 
-    private void moveMouse(String direction) {
-        switch (direction) {
-            case "up":
-                y -= INCREMENT;
-                break;
-            case "down":
-                y += INCREMENT;
-                break;
-            case "left":
-                x -= INCREMENT;
-                break;
-            case "right":
-                x += INCREMENT;
-                break;
-        }
+    private void handleMouseEvent(String[] parameters){
+        String action = parameters[1];
 
+        switch (action){
+            case "move":
+                moveMouse(Integer.parseInt(parameters[2]), Integer.parseInt(parameters[3]));
+                break;
+            case "click":
+                clickMouse(parameters[2]);
+        }
+    }
+
+    private void moveMouse(int _x, int _y) {
+        x += _x;
+        y += _y;
         if (x < 0) x = 0;
         if (x > X) x = X;
         if (y < 0) y = 0;
         if (y > Y) y = Y;
-        System.out.println(String.format("x = %d y = %d ", x, y));
         robot.mouseMove(x, y);
+    }
+
+    private void clickMouse(String button){
+        switch (button){
+            case "left":
+                robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+                robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                break;
+            case "right":
+                robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
+                robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+                System.out.println(button + " mouse button clicked");
+        }
     }
 }

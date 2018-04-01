@@ -1,51 +1,55 @@
 <!DOCTYPE html>
-<html lang=en>
+<html lang=en  style="height=100%;">
 <title>Examples of using the ondrag Global Event Attribute</title>
-<meta content="width=device-width">
-<style>
-  div {
-    margin: 0em;
-    padding: 2em;
-  }
-  #source {
-    color: blue;
-    border: 1px solid black;
-  }
-  #target {
-    border: 1px solid black;
-  }
-</style>
-</head>
-<script>
-function drag_handler(ev) {
- console.log("Drag");
-}
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<!-- <body style="width=100%;height=100%;"> -->
+<body style="height=100%;">
+	<canvas id="canvas" style="width:100%;height:450px; border:solid black 1px;">
+	  Your browser does not support canvas element.
+	</canvas>
+	<div style="display:inline-block; width:49%; height:50px; background-color: grey;" onclick="leftClick()"></div>
+	<div style="display:inline-block; width:49%; height:50px; background-color: grey;" onclick="rightClick()"></div>
 
-function dragstart_handler(ev) {
- console.log("dragStart");
- ev.dataTransfer.setData("text", ev.target.id);
-}
+	<script type="text/javascript">
+		var el = document.getElementsByTagName("canvas")[0];
+		el.addEventListener("touchmove", handleMove, false);
+		el.addEventListener("touchstart", handleStart, false);
+		var pX, pY;
 
-function drop_handler(ev) {
- console.log("Drop");
- ev.currentTarget.style.background = "lightyellow";
+		var changedTouches;
+		function handleMove(event){
+		  	changedTouches = event.changedTouches;
+		  	x = changedTouches[0].pageX;
+		  	y = changedTouches[0].pageY;
 
- ev.preventDefault();
- var data = ev.dataTransfer.getData("text");
- ev.target.appendChild(document.getElementById(data));
-}
+	  		dx = x-pX;
+	  		dy = y-pY;
+	  		distance = Math.sqrt( dx*dx + dy*dy);
+	  		if(distance > 0){
+				updatePosition(Math.round(dx), Math.round(dy));
+				pX = x;
+				pY = y;
+		  		console.log("x=" +dx, "y=" +dy);
+	  		}
+		}
 
-function dragover_handler(ev) {
- console.log("dragOver");
- ev.preventDefault();
-}
-</script>
-<body>
-<h1>Examples of <code>ondrag</code>, <code>ondrop</code>, <code>ondragstart</code>, <code>ondragover</code></h1>
- <div> <!-- <div class="source"> -->
-   <p id="source" ondrag="drag_handler(event);" ondragstart="dragstart_handler(event);" draggable="true">
-     Select this element, drag it to the Drop Zone and then release the selection to move the element.</p>
- </div>
- <div id="target" ondrop="drop_handler(event);" ondragover="dragover_handler(event);">Drop Zone</div>
-</body>
+		function handleStart(event){
+			changedTouches = event.changedTouches;
+			pX = changedTouches[0].pageX;
+			pY = changedTouches[0].pageY;
+		}
+
+		function updatePosition(x, y){
+			$.post('/mouse/move/' + x + '/' + y);
+		}
+
+		function leftClick(){
+			$.post('/mouse/click/left');
+		}
+
+		function rightClick(){
+			$.post('/mouse/click/right');
+		}
+	</script>
 </html>
